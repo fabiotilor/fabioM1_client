@@ -1,15 +1,8 @@
-// app/components/Register.tsx
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { Button, Form, Input } from "antd";
-import { User } from "@/types/user"; 
-//import { getApiDomain } from "@/utils/domain";
-
-
-
-
+import { User } from "@/types/user";
 
 interface FormFieldProps {
   username: string;
@@ -18,11 +11,10 @@ interface FormFieldProps {
 }
 
 const Register: React.FC = () => {
-  //const router = useRouter();
   const apiService = useApi();
 
   const handleRegister = async (values: FormFieldProps) => {
-    console.log("Attempting to register with:", values);  // This should log when form is submitted
+    console.log("Attempting to register with:", values); // This should log when form is submitted
     try {
       const response = await apiService.post<User>("/users/register", values);
       console.log("Registration successful:", response);
@@ -31,7 +23,6 @@ const Register: React.FC = () => {
       console.error("Error during registration:", error);
     }
   };
-  
 
   return (
     <div className="register-container">

@@ -6,10 +6,6 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import { Button, Form, Input, Tabs } from "antd";
 import { useEffect, useState } from "react";
-//import { getApiDomain } from "@/utils/domain";
-
-
-
 
 interface FormFieldProps {
   username: string;
@@ -25,29 +21,29 @@ const Login: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
 
   const handleLogin = async (values: FormFieldProps) => {
-  try {
-    const response = await apiService.post<User>("/users/login", {
-      username: values.username,
-      password: values.password,
-    });
+    try {
+      const response = await apiService.post<User>("/users/login", {
+        username: values.username,
+        password: values.password,
+      });
 
-    if (response.token) {
-      setToken(response.token);
-      router.push("/users/dashboard");
+      if (response.token) {
+        setToken(response.token);
+        router.push("/users/dashboard");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(`Something went wrong during the login:\n${error.message}`);
+      } else {
+        console.error("An unknown error occurred during login.");
+      }
     }
-  } catch (error) {
-    if (error instanceof Error) {
-      alert(`Something went wrong during the login:\n${error.message}`);
-    } else {
-      console.error("An unknown error occurred during login.");
-    }
-  }
-};
+  };
 
   const handleRegister = async (values: FormFieldProps) => {
     try {
-      const response = await apiService.post<User>("/users/register", values );
-  
+      const response = await apiService.post<User>("/users/register", values);
+
       if (response.token) {
         setToken(response.token);
         router.push("/users/dashboard");
@@ -76,82 +72,91 @@ const Login: React.FC = () => {
         console.error("Failed to fetch user data:", error);
       }
     };
-  
+
     fetchUserData();
-  }, [apiService]); 
+  }, [apiService]);
+
+  const items = [
+    {
+      key: "1",
+      label: "Login",
+      children: (
+        <Form
+          form={form}
+          name="login"
+          size="large"
+          variant="outlined"
+          onFinish={handleLogin}
+          layout="vertical"
+        >
+          <Form.Item
+            name="username"
+            label="Username"
+            rules={[{ required: true, message: "Please input your username!" }]}
+          >
+            <Input placeholder="Enter username" />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <Input.Password placeholder="Enter password" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" className="login-button">
+              Login
+            </Button>
+          </Form.Item>
+        </Form>
+      ),
+    },
+    {
+      key: "2",
+      label: "Register",
+      children: (
+        <Form
+          form={form}
+          name="register"
+          size="large"
+          variant="outlined"
+          onFinish={handleRegister}
+          layout="vertical"
+        >
+          <Form.Item
+            name="username"
+            label="Username"
+            rules={[{ required: true, message: "Please input your username!" }]}
+          >
+            <Input placeholder="Enter username" />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <Input.Password placeholder="Enter password" />
+          </Form.Item>
+          <Form.Item
+            name="name"
+            label="Name"
+            rules={[{ required: false, message: "Please input your name!" }]}
+          >
+            <Input placeholder="Enter name" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" className="login-button">
+              Register
+            </Button>
+          </Form.Item>
+        </Form>
+      ),
+    },
+  ];
 
   return (
     <div className="login-container">
-      <Tabs defaultActiveKey="1">
-        <Tabs.TabPane tab="Login" key="1">
-          <Form
-            form={form}
-            name="login"
-            size="large"
-            variant="outlined"
-            onFinish={handleLogin}
-            layout="vertical"
-          >
-            <Form.Item
-              name="username"
-              label="Username"
-              rules={[{ required: true, message: "Please input your username!" }]}
-            >
-              <Input placeholder="Enter username" />
-            </Form.Item>
-            <Form.Item
-              name="password"
-              label="Password"
-              rules={[{ required: true, message: "Please input your password!" }]}
-            >
-              <Input.Password placeholder="Enter password" />
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit" className="login-button">
-                Login
-              </Button>
-            </Form.Item>
-          </Form>
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Register" key="2">
-          <Form
-            form={form}
-            name="register"
-            size="large"
-            variant="outlined"
-            onFinish={handleRegister}
-            layout="vertical"
-          >
-            <Form.Item
-              name="username"
-              label="Username"
-              rules={[{ required: true, message: "Please input your username!" }]}
-            >
-              <Input placeholder="Enter username" />
-            </Form.Item>
-            <Form.Item
-              name="password"
-              label="Password"
-              rules={[{ required: true, message: "Please input your password!" }]}
-            >
-              <Input.Password placeholder="Enter password" />
-            </Form.Item>
-            <Form.Item
-              name="name"
-              label="Name"
-              rules={[{ required: false, message: "Please input your name!" }]}
-            >
-              <Input placeholder="Enter name" />
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit" className="login-button">
-                Register
-              </Button>
-            </Form.Item>
-          </Form>
-        </Tabs.TabPane>
-      </Tabs>
-  
+      <Tabs defaultActiveKey="1" items={items} />
       {user && (
         <div className="dashboard">
           <h1>Welcome, {user.username}!</h1>
@@ -164,7 +169,5 @@ const Login: React.FC = () => {
     </div>
   );
 };
-
-
 
 export default Login;
