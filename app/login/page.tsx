@@ -6,7 +6,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import { Button, Form, Input, Tabs } from "antd";
 import { useEffect, useState } from "react";
-import { getApiDomain } from "@/utils/domain";
+//import { getApiDomain } from "@/utils/domain";
 
 
 
@@ -76,9 +76,9 @@ const Login: React.FC = () => {
         console.error("Failed to fetch user data:", error);
       }
     };
-
+  
     fetchUserData();
-  }, []);
+  }, [apiService]); 
 
   return (
     <div className="login-container">

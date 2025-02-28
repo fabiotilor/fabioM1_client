@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { Button, Form, Input } from "antd";
 import { User } from "@/types/user"; 
-import { getApiDomain } from "@/utils/domain";
+//import { getApiDomain } from "@/utils/domain";
 
 
 
@@ -18,7 +18,7 @@ interface FormFieldProps {
 }
 
 const Register: React.FC = () => {
-  const router = useRouter();
+  //const router = useRouter();
   const apiService = useApi();
 
   const handleRegister = async (values: FormFieldProps) => {
