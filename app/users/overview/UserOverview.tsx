@@ -1,3 +1,4 @@
+
 "use client";
 
 import "@ant-design/v5-patch-for-react-19"; 
@@ -24,6 +25,7 @@ const UserOverview: React.FC = () => {
       try {
         const token = getToken();
         if (!token) {
+          console.log("No token found, redirecting to login");
           router.push("/login");
           return;
         }

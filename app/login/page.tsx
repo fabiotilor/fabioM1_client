@@ -14,59 +14,43 @@ interface FormFieldProps {
   name?: string;
 }
 
-const Login: React.FC = () => {
+const Page: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
-  const [form] = Form.useForm();
-  const { setValue: setToken, getValue: getToken } = useLocalStorage<string>("token", "");
+  const { setValue: setToken, getValue: getToken, removeValue: removeToken } = useLocalStorage<string>("token", "");
   const [user, setUser] = useState<User | null>(null);
 
   const handleLogin = async (values: FormFieldProps) => {
     try {
-      console.log("Sending login request with values:", values);
-      const response = await apiService.post<User>("/users/login", {
+      const response = await apiService.post<{ token: string }>("/users/login", {
         username: values.username,
         password: values.password,
       });
-      console.log("Login response:", response);
-
       if (response.token) {
         setToken(response.token);
         router.push("/users/overview");
       }
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Login failed:", error.message);
-        alert(`Login failed: ${error.message}`);
-      } else {
-        console.error("An unknown error occurred during login.");
-      }
+      console.error("Login failed:", error);
+      alert("Login failed. Please check your credentials.");
     }
   };
 
   const handleRegister = async (values: FormFieldProps) => {
     try {
-      console.log("Sending registration request with values:", values);
-      const response = await apiService.post<User>("/users/register", values);
-      console.log("Registration response:", response);
-
+      const response = await apiService.post<{ token: string }>("/users/register", values);
       if (response.token) {
         setToken(response.token);
         router.push("/users/overview");
       }
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Registration failed:", error.message);
-        alert(`Registration failed: ${error.message}`);
-        router.push("/login");
-      } else {
-        console.error("An unknown error occurred during registration.");
-      }
+      console.error("Registration failed:", error);
+      alert("Registration failed. Username might be taken.");
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    removeToken();
     router.push("/login");
   };
 
@@ -93,10 +77,8 @@ const Login: React.FC = () => {
       label: "Login",
       children: (
         <Form
-          form={form}
           name="login"
           size="large"
-          variant="outlined"
           onFinish={handleLogin}
           layout="vertical"
         >
@@ -115,7 +97,7 @@ const Login: React.FC = () => {
             <Input.Password placeholder="Enter password" />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="login-button">
+            <Button type="primary" htmlType="submit">
               Login
             </Button>
           </Form.Item>
@@ -127,10 +109,8 @@ const Login: React.FC = () => {
       label: "Register",
       children: (
         <Form
-          form={form}
           name="register"
           size="large"
-          variant="outlined"
           onFinish={handleRegister}
           layout="vertical"
         >
@@ -156,7 +136,7 @@ const Login: React.FC = () => {
             <Input placeholder="Enter name" />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="login-button">
+            <Button type="primary" htmlType="submit">
               Register
             </Button>
           </Form.Item>
@@ -165,20 +145,23 @@ const Login: React.FC = () => {
     },
   ];
 
+  if (user) {
+    return (
+      <div className="dashboard">
+        <h1>Welcome, {user.username}!</h1>
+        <p>Account created on: {new Date(user.createdAt).toLocaleDateString()}</p>
+        <Button type="primary" onClick={handleLogout}>
+          Logout
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="login-container">
       <Tabs defaultActiveKey="1" items={items} />
-      {user && (
-        <div className="dashboard">
-          <h1>Welcome, {user.username}!</h1>
-          <p>Account created on: {new Date(user.createdAt).toLocaleDateString()}</p>
-          <Button type="primary" onClick={handleLogout}>
-            Logout
-          </Button>
-        </div>
-      )}
     </div>
   );
 };
 
-export default Login;
+export default Page;
