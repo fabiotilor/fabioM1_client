@@ -42,14 +42,17 @@ const Login: React.FC = () => {
 
   const handleRegister = async (values: FormFieldProps) => {
     try {
+      console.log("Sending registration request with values:", values); // Log the request data
       const response = await apiService.post<User>("/users/register", values);
-
+      console.log("Registration response:", response); // Log the response data
+  
       if (response.token) {
         setToken(response.token);
         router.push("/users/dashboard");
       }
     } catch (error) {
       if (error instanceof Error) {
+        console.error("Registration failed:", error.message); 
         alert(`Registration failed: ${error.message}`);
         router.push("/login");
       } else {
