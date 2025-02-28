@@ -1,5 +1,6 @@
 "use client";
 
+import "@ant-design/v5-patch-for-react-19";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
@@ -17,23 +18,26 @@ const Login: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
-  const { set: setToken } = useLocalStorage<string>("token", "");
+  const { setValue: setToken, getValue: getToken } = useLocalStorage<string>("token", "");
   const [user, setUser] = useState<User | null>(null);
 
   const handleLogin = async (values: FormFieldProps) => {
     try {
+      console.log("Sending login request with values:", values);
       const response = await apiService.post<User>("/users/login", {
         username: values.username,
         password: values.password,
       });
+      console.log("Login response:", response);
 
       if (response.token) {
         setToken(response.token);
-        router.push("/users/dashboard");
+        router.push("/users/overview");
       }
     } catch (error) {
       if (error instanceof Error) {
-        alert(`Something went wrong during the login:\n${error.message}`);
+        console.error("Login failed:", error.message);
+        alert(`Login failed: ${error.message}`);
       } else {
         console.error("An unknown error occurred during login.");
       }
@@ -42,17 +46,17 @@ const Login: React.FC = () => {
 
   const handleRegister = async (values: FormFieldProps) => {
     try {
-      console.log("Sending registration request with values:", values); // Log the request data
+      console.log("Sending registration request with values:", values);
       const response = await apiService.post<User>("/users/register", values);
-      console.log("Registration response:", response); // Log the response data
-  
+      console.log("Registration response:", response);
+
       if (response.token) {
         setToken(response.token);
-        router.push("/users/dashboard");
+        router.push("/users/overview");
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Registration failed:", error.message); 
+        console.error("Registration failed:", error.message);
         alert(`Registration failed: ${error.message}`);
         router.push("/login");
       } else {
@@ -69,6 +73,10 @@ const Login: React.FC = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        const token = getToken();
+        if (!token) {
+          return;
+        }
         const response = await apiService.get<User>("/users/me");
         setUser(response);
       } catch (error) {
@@ -77,7 +85,7 @@ const Login: React.FC = () => {
     };
 
     fetchUserData();
-  }, [apiService]);
+  }, [apiService, getToken]);
 
   const items = [
     {

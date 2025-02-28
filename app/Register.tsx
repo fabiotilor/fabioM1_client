@@ -1,5 +1,6 @@
 "use client";
 
+import "@ant-design/v5-patch-for-react-19";
 import { useApi } from "@/hooks/useApi";
 import { Button, Form, Input } from "antd";
 import { User } from "@/types/user";
