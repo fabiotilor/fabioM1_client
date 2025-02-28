@@ -50,7 +50,9 @@ export class ApiService {
       error.status = res.status;
       throw error;
     }
-    return res.json() as Promise<T>;
+    return res.headers.get("Content-Type")?.includes("application/json")
+      ? res.json() as Promise<T>
+      : Promise.resolve(res as T);
   }
 
   /**
@@ -77,7 +79,9 @@ export class ApiService {
    * @returns JSON data of type T.
    */
   public async post<T>(endpoint: string, data: unknown): Promise<T> {
+    console.log("Sending POST request to:", endpoint);  // Log the URL
     const url = `${this.baseURL}${endpoint}`;
+    console.log("Data being sent:", data);  // Log the request data
     const res = await fetch(url, {
       method: "POST",
       headers: this.defaultHeaders,
@@ -88,6 +92,7 @@ export class ApiService {
       "An error occurred while posting the data.\n",
     );
   }
+  
 
   /**
    * PUT request.

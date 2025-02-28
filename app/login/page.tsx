@@ -6,6 +6,10 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import { Button, Form, Input, Tabs } from "antd";
 import { useEffect, useState } from "react";
+import { getApiDomain } from "@/utils/domain";
+
+
+
 
 interface FormFieldProps {
   username: string;
@@ -21,26 +25,29 @@ const Login: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
 
   const handleLogin = async (values: FormFieldProps) => {
-    try {
-      const response = await apiService.post<User>("/users/login", { values });
+  try {
+    const response = await apiService.post<User>("/users/login", {
+      username: values.username,
+      password: values.password,
+    });
 
-      if (response.token) {
-        setToken(response.token);
-        router.push("/users/dashboard");
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(`Something went wrong during the login:\n${error.message}`);
-      } else {
-        console.error("An unknown error occurred during login.");
-      }
+    if (response.token) {
+      setToken(response.token);
+      router.push("/users/dashboard");
     }
-  };
+  } catch (error) {
+    if (error instanceof Error) {
+      alert(`Something went wrong during the login:\n${error.message}`);
+    } else {
+      console.error("An unknown error occurred during login.");
+    }
+  }
+};
 
   const handleRegister = async (values: FormFieldProps) => {
     try {
-      const response = await apiService.post<User>("/users/register", { values });
-
+      const response = await apiService.post<User>("/users/register", values );
+  
       if (response.token) {
         setToken(response.token);
         router.push("/users/dashboard");
@@ -48,7 +55,7 @@ const Login: React.FC = () => {
     } catch (error) {
       if (error instanceof Error) {
         alert(`Registration failed: ${error.message}`);
-        router.push("/register");
+        router.push("/login");
       } else {
         console.error("An unknown error occurred during registration.");
       }
@@ -144,7 +151,7 @@ const Login: React.FC = () => {
           </Form>
         </Tabs.TabPane>
       </Tabs>
-
+  
       {user && (
         <div className="dashboard">
           <h1>Welcome, {user.username}!</h1>
@@ -157,5 +164,7 @@ const Login: React.FC = () => {
     </div>
   );
 };
+
+
 
 export default Login;
