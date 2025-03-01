@@ -1,7 +1,6 @@
-
 "use client";
 
-import "@ant-design/v5-patch-for-react-19"; 
+import "@ant-design/v5-patch-for-react-19";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
@@ -25,7 +24,6 @@ const UserOverview: React.FC = () => {
       try {
         const token = getToken();
         if (!token) {
-          console.log("No token found, redirecting to login");
           router.push("/login");
           return;
         }

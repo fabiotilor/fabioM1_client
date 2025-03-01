@@ -7,54 +7,38 @@ function useLocalStorage<T>(key: string, initialValue: T) {
     }
     try {
       const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
+      return item ? JSON.parse(item) as T : initialValue;
     } catch (error) {
-      console.error(error);
+      console.error("Error reading localStorage key “" + key + "”: ", error);
       return initialValue;
     }
   });
 
-  const setValue = (value: T) => {
+  const setValue = (value: T | ((val: T) => T)) => {
     try {
-      setStoredValue(value);
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
       if (typeof window !== "undefined") {
-        window.localStorage.setItem(key, JSON.stringify(value));
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
       }
     } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const getValue = (): T | null => {
-    if (typeof window === "undefined") {
-      return null;
-    }
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : null;
-    } catch (error) {
-      console.error(error);
-      return null;
+      console.error("Error setting localStorage key “" + key + "”: ", error);
     }
   };
 
   const removeValue = () => {
     try {
+      setStoredValue(initialValue);
       if (typeof window !== "undefined") {
         window.localStorage.removeItem(key);
       }
-      setStoredValue(initialValue);
     } catch (error) {
-      console.error(error);
+      console.error("Error removing localStorage key “" + key + "”: ", error);
     }
   };
 
-  return {
-    storedValue,
-    setValue,
-    getValue,
-    removeValue,
-  };
+  return { storedValue, setValue, removeValue, getValue: () => storedValue };
 }
 
 export default useLocalStorage;
